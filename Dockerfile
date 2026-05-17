@@ -5,10 +5,6 @@ FROM base AS deps
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM base AS prod-deps
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
-
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
@@ -29,10 +25,10 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --chown=nextjs:nodejs --from=builder /app/public ./public
 COPY --chown=nextjs:nodejs --from=builder /app/.next/standalone ./
 COPY --chown=nextjs:nodejs --from=builder /app/.next/static ./.next/static
-COPY --chown=nextjs:nodejs --from=prod-deps /app/node_modules ./node_modules
 COPY --chown=nextjs:nodejs --from=builder /app/package.json ./package.json
 COPY --chown=nextjs:nodejs --from=builder /app/package-lock.json ./package-lock.json
-COPY --chown=nextjs:nodejs --from=builder /app/src/db/migrations ./src/db/migrations
+COPY --chown=nextjs:nodejs --from=deps /app/node_modules/bcryptjs ./node_modules/bcryptjs
+COPY --chown=nextjs:nodejs --from=deps /app/node_modules/postgres ./node_modules/postgres
 COPY --chown=nextjs:nodejs --from=builder /app/scripts ./scripts
 COPY --chown=nextjs:nodejs --from=builder /app/start.sh ./start.sh
 

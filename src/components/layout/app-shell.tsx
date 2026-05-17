@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { SessionPayload } from "@/lib/jwt";
 
 const navItems = [
   { label: "Dashboard", mobileLabel: "Beranda", href: "/dashboard", icon: Home },
@@ -31,10 +32,21 @@ function isActive(pathname: string, href: string) {
   return pathname === href;
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+function getInitials(user: SessionPayload) {
+  const nameParts = user.name.trim().split(/\s+/).filter(Boolean);
+
+  if (nameParts.length > 0) {
+    return nameParts.slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  }
+
+  return user.email.slice(0, 2).toUpperCase();
+}
+
+export function AppShell({ children, user }: { children: ReactNode; user: SessionPayload }) {
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const initials = getInitials(user);
 
   const handleSearch = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
@@ -111,9 +123,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             className="flex min-h-11 items-center gap-2 rounded-full border border-border bg-white p-1 pr-3"
           >
             <span className="grid h-8 w-8 place-items-center rounded-full bg-foreground text-xs font-black text-white">
-              AD
+              {initials}
             </span>
-            <span className="hidden text-sm font-bold md:block">Admin Dewi</span>
+            <span className="hidden max-w-40 truncate text-sm font-bold md:block">{user.name}</span>
           </Link>
         </header>
 

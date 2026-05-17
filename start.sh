@@ -1,6 +1,5 @@
 #!/bin/sh
 set -e
 
-npx drizzle-kit migrate
-npm run db:seed
-node server.js
+node scripts/bootstrap.mjs
+exec node server.js

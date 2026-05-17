@@ -35,7 +35,7 @@ The container runs migrations and admin seed automatically on startup. To change
 
 ## Notes
 
-- The container runs database migrations and admin seed on startup before `node server.js`.
+- The container runs database migrations and admin seed on startup through a production JavaScript bootstrap script before `node server.js`.
 - When admin email/password changes through env, existing sessions are revoked and you must log in again.
 - Invoice PDFs are stored on disk, so `/app/storage/invoices` must be persistent.
 - Login rate limiting is in-memory. Use one running app instance, or replace it with Redis-backed rate limiting before scaling horizontally.

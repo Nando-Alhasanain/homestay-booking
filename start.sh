@@ -1,5 +1,8 @@
 #!/bin/sh
 set -e
 
-node scripts/bootstrap.mjs
-exec node server.js
+mkdir -p /app/storage/invoices
+chown -R nextjs:nodejs /app/storage
+
+su-exec nextjs node scripts/bootstrap.mjs
+exec su-exec nextjs node server.js

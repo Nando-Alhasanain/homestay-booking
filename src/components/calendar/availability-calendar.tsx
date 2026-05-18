@@ -19,6 +19,49 @@ import type { Property } from "@/types";
 
 const dayNames = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
+const bookingColorClasses = [
+  {
+    cell: "bg-sky-100 font-black text-sky-700 ring-1 ring-inset ring-sky-200 hover:bg-sky-100",
+    date: "bg-white text-sky-700 shadow-sm",
+    text: "text-sky-950/80",
+  },
+  {
+    cell: "bg-emerald-100 font-black text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100",
+    date: "bg-white text-emerald-700 shadow-sm",
+    text: "text-emerald-950/80",
+  },
+  {
+    cell: "bg-violet-100 font-black text-violet-700 ring-1 ring-inset ring-violet-200 hover:bg-violet-100",
+    date: "bg-white text-violet-700 shadow-sm",
+    text: "text-violet-950/80",
+  },
+  {
+    cell: "bg-rose-100 font-black text-rose-700 ring-1 ring-inset ring-rose-200 hover:bg-rose-100",
+    date: "bg-white text-rose-700 shadow-sm",
+    text: "text-rose-950/80",
+  },
+  {
+    cell: "bg-amber-100 font-black text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100",
+    date: "bg-white text-amber-700 shadow-sm",
+    text: "text-amber-950/80",
+  },
+  {
+    cell: "bg-cyan-100 font-black text-cyan-700 ring-1 ring-inset ring-cyan-200 hover:bg-cyan-100",
+    date: "bg-white text-cyan-700 shadow-sm",
+    text: "text-cyan-950/80",
+  },
+  {
+    cell: "bg-fuchsia-100 font-black text-fuchsia-700 ring-1 ring-inset ring-fuchsia-200 hover:bg-fuchsia-100",
+    date: "bg-white text-fuchsia-700 shadow-sm",
+    text: "text-fuchsia-950/80",
+  },
+  {
+    cell: "bg-lime-100 font-black text-lime-700 ring-1 ring-inset ring-lime-200 hover:bg-lime-100",
+    date: "bg-white text-lime-700 shadow-sm",
+    text: "text-lime-950/80",
+  },
+] as const;
+
 type BookedDate = {
   date: string;
   bookingId: string;
@@ -69,6 +112,16 @@ function buildCalendarDays(monthDate: Date) {
 
 function toDateValue(date: Date) {
   return format(date, "yyyy-MM-dd");
+}
+
+function getBookingColor(bookingId: string) {
+  let hash = 0;
+
+  for (let index = 0; index < bookingId.length; index += 1) {
+    hash = (hash + bookingId.charCodeAt(index) * (index + 1)) % bookingColorClasses.length;
+  }
+
+  return bookingColorClasses[hash];
 }
 
 function formatDateRange(block: DateBlock) {
@@ -240,40 +293,41 @@ export function AvailabilityCalendar() {
 
       {error ? <p className="m-4 rounded-2xl border border-danger/20 bg-red-50 p-3 text-sm font-semibold text-danger">{error}</p> : null}
 
-      <div className="overflow-x-auto">
-        <div className="grid min-w-[680px] grid-cols-7">
+      <div className="overflow-x-hidden sm:overflow-x-auto">
+        <div className="grid grid-cols-7 sm:min-w-[680px]">
           {dayNames.map((day) => (
-            <div key={day} className="border-b border-r border-border bg-muted p-2.5 text-xs font-black text-muted-foreground last:border-r-0">
+            <div key={day} className="border-b border-r border-border bg-muted p-1.5 text-center text-[10px] font-black text-muted-foreground last:border-r-0 sm:p-2.5 sm:text-left sm:text-xs">
               {day}
             </div>
           ))}
           {days.map((day, index) => {
             const booked = bookedMap.get(day.date);
             const blocked = blockedMap.get(day.date);
+            const bookingColor = booked ? getBookingColor(booked.bookingId) : null;
             const date = new Date(`${day.date}T00:00:00`);
             const isBlockedOnly = !booked && blocked;
 
             const className = cn(
-              "group relative min-h-16 border-b border-r border-border p-2.5 text-left text-sm transition last:border-r-0 hover:bg-muted",
+              "group relative min-h-11 border-b border-r border-border p-1.5 text-left text-xs transition last:border-r-0 hover:bg-muted sm:min-h-16 sm:p-2.5 sm:text-sm",
               index % 7 === 6 && "border-r-0",
               day.muted && "bg-white/60 text-[#c1c1c1]",
-              booked && "bg-primary/10 font-black text-primary ring-1 ring-inset ring-primary/20 hover:bg-primary/15",
-              isBlockedOnly && "bg-warning/10 font-black text-warning ring-1 ring-inset ring-warning/20 hover:bg-warning/15",
+              bookingColor?.cell,
+              isBlockedOnly && "bg-foreground font-black text-white hover:bg-foreground",
             );
 
             const content = (
               <>
-                <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full", booked && "bg-white text-primary shadow-sm", isBlockedOnly && "bg-white text-warning shadow-sm")}>{format(date, "d", { locale: id })}</span>
+                <span className={cn("relative z-10 inline-flex h-6 w-6 items-center justify-center rounded-full sm:h-7 sm:w-7", bookingColor?.date)}>{format(date, "d", { locale: id })}</span>
                 {booked ? (
-                  <div className="mt-1.5">
-                    <small className="line-clamp-2 block text-xs font-semibold leading-4 text-foreground/80">
+                  <div className="mt-1.5 hidden sm:block">
+                    <small className={cn("line-clamp-2 block text-xs font-semibold leading-4", bookingColor?.text)}>
                       {booked.guestName}
                     </small>
                   </div>
                 ) : null}
                 {isBlockedOnly ? (
-                  <div className="mt-1.5">
-                    <small className="line-clamp-2 block text-xs font-semibold leading-4 text-foreground/80">
+                  <div className="mt-1.5 hidden sm:block">
+                    <small className="relative z-10 line-clamp-2 block text-xs font-semibold leading-4 text-white/80">
                       {blocked.reason || "Tidak tersedia"}
                     </small>
                   </div>
@@ -294,11 +348,11 @@ export function AvailabilityCalendar() {
 
       <div className="flex flex-wrap items-center gap-3 p-4">
         <span className="inline-flex items-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary">
-          <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+          <span className="h-2.5 w-6 rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-rose-400" />
           Tanggal terisi
         </span>
-        <span className="inline-flex items-center gap-2 rounded-2xl border border-warning/20 bg-warning/10 px-3 py-1.5 text-xs font-bold text-warning">
-          <span className="h-2.5 w-2.5 rounded-full bg-warning" />
+        <span className="inline-flex items-center gap-2 rounded-2xl border border-foreground bg-foreground px-3 py-1.5 text-xs font-bold text-white">
+          <span className="h-2.5 w-2.5 rounded-full bg-white" />
           Tanggal diblokir
         </span>
         <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-muted px-3 py-1.5 text-xs font-bold text-muted-foreground">

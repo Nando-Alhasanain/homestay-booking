@@ -18,8 +18,15 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <div className={cn("mb-6 grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end", className)}>
-      <div>
+    <div
+      className={cn(
+        action
+          ? "mb-4 grid gap-4 md:mb-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+          : "hidden md:mb-6 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-end",
+        className,
+      )}
+    >
+      <div className="hidden md:block">
         {eyebrow ? (
           <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-primary">
             {eyebrow}
@@ -34,7 +41,7 @@ export function SectionHeader({
           </p>
         ) : null}
       </div>
-      {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
+      {action ? <div className="flex flex-wrap gap-2 md:justify-end">{action}</div> : null}
     </div>
   );
 }

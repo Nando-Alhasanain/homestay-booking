@@ -41,9 +41,45 @@ function getInitials(user: SessionPayload) {
   return user.email.slice(0, 2).toUpperCase();
 }
 
+function getMobilePageMeta(pathname: string) {
+  if (pathname === "/" || pathname === "/dashboard") {
+    return { title: "Dashboard", description: "Ringkasan booking hari ini." };
+  }
+  if (pathname === "/bookings/new") {
+    return { title: "Booking Baru", description: "Isi data tamu dan tanggal menginap." };
+  }
+  if (/^\/bookings\/[^/]+\/edit$/.test(pathname)) {
+    return { title: "Edit Booking", description: "Perbarui data booking tamu." };
+  }
+  if (/^\/bookings\/[^/]+$/.test(pathname)) {
+    return { title: "Detail Booking", description: "Lihat rincian booking tamu." };
+  }
+  if (pathname === "/bookings") {
+    return { title: "Booking", description: "Kelola daftar booking tamu." };
+  }
+  if (pathname === "/calendar") {
+    return { title: "Kalender", description: "Lihat tanggal kosong dan terisi." };
+  }
+  if (pathname === "/property") {
+    return { title: "Properti", description: "Kelola homestay." };
+  }
+  if (/^\/invoices\/[^/]+$/.test(pathname)) {
+    return { title: "Detail Invoice", description: "Download atau bagikan invoice." };
+  }
+  if (pathname === "/invoices") {
+    return { title: "Invoice", description: "Kelola invoice booking." };
+  }
+  if (pathname === "/settings") {
+    return { title: "Pengaturan", description: "Kelola akun dan aplikasi." };
+  }
+
+  return { title: "Homestay", description: "Booking management." };
+}
+
 export function AppShell({ children, user }: { children: ReactNode; user: SessionPayload }) {
   const pathname = usePathname();
   const initials = getInitials(user);
+  const mobilePageMeta = getMobilePageMeta(pathname);
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -86,10 +122,19 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
       </aside>
 
       <main className="min-w-0 px-4 pb-24 pt-0 lg:px-7 lg:pb-10">
-        <header className="sticky top-0 z-20 -mx-4 mb-5 flex items-center justify-end gap-3 border-b border-border/75 bg-background/90 px-4 py-3 backdrop-blur-xl lg:-mx-7 lg:mb-7 lg:px-7 lg:py-4">
+        <header className="sticky top-0 z-20 -mx-4 mb-5 flex items-center justify-between gap-3 border-b border-border/75 bg-background/90 px-4 py-3 backdrop-blur-xl lg:-mx-7 lg:mb-7 lg:justify-end lg:px-7 lg:py-4">
+          <div className="min-w-0 lg:hidden">
+            <h1 className="truncate text-lg font-black leading-tight tracking-[-0.03em]">
+              {mobilePageMeta.title}
+            </h1>
+            <p className="mt-0.5 truncate text-xs font-semibold text-muted-foreground">
+              {mobilePageMeta.description}
+            </p>
+          </div>
+
           <Link
             href="/settings"
-            className="flex min-h-11 items-center gap-2 rounded-full border border-border bg-white p-1 pr-3"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white p-1 md:w-auto md:justify-start md:gap-2 md:pr-3"
           >
             <span className="grid h-8 w-8 place-items-center rounded-full bg-foreground text-xs font-black text-white">
               {initials}

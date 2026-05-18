@@ -9,3 +9,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 docker-compose.yml
+
+# Generated invoice PDFs (local dev)
+storage/invoices/*.pdf

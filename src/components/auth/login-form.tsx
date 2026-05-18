@@ -26,7 +26,7 @@ export function LoginForm() {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      router.push("/dashboard");
+      router.push("/calendar");
       router.refresh();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Login gagal.");

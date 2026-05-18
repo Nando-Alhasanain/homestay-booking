@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { CheckCircle2, Plus, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export function PropertyView() {
   const [toast, setToast] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
 
   const property = properties.find((item) => item.id === selectedId) ?? properties[0];
   const isCreating = mode === "create" || !property;
@@ -158,14 +160,37 @@ export function PropertyView() {
     }
   }
 
+  async function activateSelectedProperty() {
+    if (!property || isCreating || property.status === "active") return;
+
+    setIsActivating(true);
+    setError("");
+
+    try {
+      const response = await fetchJson<{ property: Record<string, unknown> }>(`/api/properties/${property.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "active" }),
+      });
+      const updated = normalizeProperty(response.property);
+      setProperties((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      showToast("Properti berhasil diaktifkan.");
+    } catch (error) {
+      handleAuthError(error);
+      setError(error instanceof Error ? error.message : "Gagal mengaktifkan properti.");
+    } finally {
+      setIsActivating(false);
+    }
+  }
+
   return (
     <>
       <SectionHeader
         title="Properti"
         description="Kelola beberapa homestay dalam satu dashboard."
+        className="hidden lg:grid"
         action={
           <Button type="button" variant="primary" onClick={startCreateProperty} disabled={isCreating}>
-            Tambah Properti
+            <Plus className="h-4 w-4" /> Tambah Properti
           </Button>
         }
       />
@@ -193,7 +218,15 @@ export function PropertyView() {
           <ElevatedCard>
             <div className="mb-4 flex items-center justify-between gap-3">
               <h2 className="text-[22px] font-black tracking-[-0.03em]">Informasi utama</h2>
-              <Badge tone={property.status === "active" ? "success" : property.status === "maintenance" ? "warning" : "neutral"}>{property.status}</Badge>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <Badge tone={property.status === "active" ? "success" : property.status === "maintenance" ? "warning" : "neutral"}>{property.status}</Badge>
+                {property.status === "inactive" ? (
+                  <Button type="button" size="sm" variant="primary" onClick={activateSelectedProperty} disabled={isActivating}>
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    {isActivating ? "Mengaktifkan..." : "Aktifkan"}
+                  </Button>
+                ) : null}
+              </div>
             </div>
             <div className="divide-y divide-border border-y border-border">
               <Detail label="Alamat" value={property.address ?? "-"} />
@@ -224,11 +257,6 @@ export function PropertyView() {
                 Batal
               </Button>
             ) : null}
-            {!isCreating && property ? (
-              <Button type="button" variant="danger" onClick={deleteSelectedProperty} disabled={isDeleting}>
-                {isDeleting ? "Menghapus..." : "Hapus Properti"}
-              </Button>
-            ) : null}
           </div>
         </div>
         <form className="grid gap-3 sm:grid-cols-2" onSubmit={saveProperty} key={isCreating ? "create" : property?.id ?? "empty"}>
@@ -242,10 +270,33 @@ export function PropertyView() {
             {isSaving ? "Menyimpan..." : isCreating ? "Tambah Properti" : "Simpan Perubahan"}
           </Button>
         </form>
+
+        {!isCreating && property ? (
+          <div className="mt-5 rounded-[20px] border border-danger/20 bg-red-50 p-4">
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+              <div>
+                <h3 className="text-sm font-black text-danger">Zona berbahaya</h3>
+                <p className="mt-1 text-sm leading-6 text-danger/80">
+                  Hapus properti jika tidak lagi digunakan. Jika sudah memiliki booking, properti akan dinonaktifkan agar histori tetap aman.
+                </p>
+              </div>
+              <Button type="button" variant="danger" onClick={deleteSelectedProperty} disabled={isDeleting} className="w-full sm:w-auto">
+                <Trash2 className="h-4 w-4" />
+                {isDeleting ? "Menghapus..." : "Hapus Properti"}
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </Card>
 
+      {!isCreating ? (
+        <Button type="button" variant="primary" onClick={startCreateProperty} className="fixed bottom-24 right-4 z-50 shadow-panel lg:hidden">
+          <Plus className="h-4 w-4" /> Properti
+        </Button>
+      ) : null}
+
       {toast ? (
-        <div className="fixed bottom-24 right-4 z-50 rounded-[20px] bg-foreground px-4 py-3 text-sm font-bold text-white shadow-panel lg:bottom-6">
+        <div className="fixed bottom-40 right-4 z-50 rounded-[20px] bg-foreground px-4 py-3 text-sm font-bold text-white shadow-panel lg:bottom-6">
           {toast}
         </div>
       ) : null}

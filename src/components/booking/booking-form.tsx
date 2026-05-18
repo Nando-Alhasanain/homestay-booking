@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -10,7 +9,7 @@ import { z } from "zod";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
-import { ElevatedCard } from "@/components/ui/card";
+import { Card, ElevatedCard } from "@/components/ui/card";
 import { Field, FieldError, Label } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -137,6 +136,7 @@ export function BookingForm({ mode = "create", bookingId, initialBooking }: Book
         if (mode === "create" && firstProperty && !form.getValues("propertyId")) {
           form.setValue("propertyId", firstProperty.id);
           form.setValue("pricePerNight", firstProperty.pricePerNight);
+          form.setValue("guestCount", firstProperty.maxGuests);
         }
       } catch (error) {
         if (error instanceof ClientApiError && error.status === 401) {
@@ -199,120 +199,132 @@ export function BookingForm({ mode = "create", bookingId, initialBooking }: Book
 
   return (
     <div className="relative">
-      <ElevatedCard>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-[22px] font-black tracking-[-0.03em]">{mode === "edit" ? "Edit Booking" : "Booking Baru"}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Masukkan data booking tamu.</p>
-          </div>
-        </div>
-
-        <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field>
-              <Label htmlFor="guestName">Nama tamu</Label>
-              <Input id="guestName" placeholder="Contoh: Sari Pratiwi" {...form.register("guestName")} />
-              {form.formState.errors.guestName ? <FieldError>{form.formState.errors.guestName.message}</FieldError> : null}
-            </Field>
-            <Field>
-              <Label htmlFor="guestPhone">Nomor HP</Label>
-              <Input id="guestPhone" dir="ltr" placeholder="Contoh: 081234567890" {...form.register("guestPhone")} />
-              {form.formState.errors.guestPhone ? <FieldError>{form.formState.errors.guestPhone.message}</FieldError> : null}
-            </Field>
-            <Field>
-              <Label htmlFor="guestEmail">Email optional</Label>
-              <Input id="guestEmail" type="email" placeholder="Opsional" {...form.register("guestEmail")} />
-              {form.formState.errors.guestEmail ? <FieldError>{form.formState.errors.guestEmail.message}</FieldError> : null}
-            </Field>
-            <Field>
-              <Label htmlFor="propertyId">Property</Label>
-              <Select
-                id="propertyId"
-                {...form.register("propertyId", {
-                  onChange: (event) => {
+      <form className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start" onSubmit={form.handleSubmit(onSubmit)}>
+        <ElevatedCard className="grid gap-5">
+          <FormSection title="Tanggal & properti" description="Pilih homestay, periode menginap, dan jumlah tamu.">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field className="sm:col-span-2">
+                <Label htmlFor="propertyId">Properti</Label>
+                <Select
+                  id="propertyId"
+                  {...form.register("propertyId", {
+                    onChange: (event) => {
                     const property = properties.find((item) => item.id === event.target.value);
-                    if (property) form.setValue("pricePerNight", property.pricePerNight);
-                  },
-                })}
-              >
-                <option value="">Pilih property</option>
-                {properties.map((property) => (
-                  <option key={property.id} value={property.id}>{property.name}</option>
-                ))}
-              </Select>
-              {selectedProperty ? <p className="text-xs text-muted-foreground">Kapasitas {selectedProperty.maxGuests} tamu</p> : null}
-            </Field>
-            <Field>
-              <Label htmlFor="checkIn">Check-in</Label>
-              <DatePicker
-                value={values.checkIn}
-                placeholder="Pilih tanggal check-in"
-                onChange={(value) => form.setValue("checkIn", value, { shouldDirty: true, shouldValidate: true })}
-              />
-              {form.formState.errors.checkIn ? <FieldError>{form.formState.errors.checkIn.message}</FieldError> : null}
-            </Field>
-            <Field>
-              <Label htmlFor="checkOut">Check-out</Label>
-              <DatePicker
-                value={values.checkOut}
-                placeholder="Pilih tanggal check-out"
-                onChange={(value) => form.setValue("checkOut", value, { shouldDirty: true, shouldValidate: true })}
-              />
-              {form.formState.errors.checkOut ? <FieldError>{form.formState.errors.checkOut.message}</FieldError> : null}
-            </Field>
-            <Field>
-              <Label htmlFor="guestCount">Jumlah tamu</Label>
-              <Input id="guestCount" type="number" min={1} {...form.register("guestCount", { valueAsNumber: true })} />
-            </Field>
-            <Field>
-              <Label htmlFor="pricePerNight">Harga per malam</Label>
-              <Input id="pricePerNight" type="number" min={0} {...form.register("pricePerNight", { valueAsNumber: true })} />
-            </Field>
-            <Field>
-              <Label htmlFor="additionalFees">Biaya tambahan</Label>
-              <Input id="additionalFees" type="number" min={0} {...form.register("additionalFees", { valueAsNumber: true })} />
-            </Field>
-            <Field>
-              <Label htmlFor="discount">Diskon</Label>
-              <Input id="discount" type="number" min={0} {...form.register("discount", { valueAsNumber: true })} />
-            </Field>
-            <Field>
-              <Label htmlFor="paidAmount">Jumlah dibayar</Label>
-              <Input id="paidAmount" type="number" min={0} {...form.register("paidAmount", { valueAsNumber: true })} />
-            </Field>
-            <Field>
-              <Label htmlFor="paymentMethod">Metode pembayaran</Label>
-              <Select id="paymentMethod" {...form.register("paymentMethod")}>
-                <option value="bank_transfer">Transfer bank</option>
-                <option value="cash">Tunai</option>
-                <option value="qris">QRIS</option>
-                <option value="other">Lainnya</option>
-              </Select>
-            </Field>
-            <Field>
-              <Label htmlFor="bookingStatus">Status booking</Label>
-              <Select id="bookingStatus" {...form.register("bookingStatus")}>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="checked_in">Checked-in</option>
-                <option value="checked_out">Checked-out</option>
-                <option value="cancelled">Cancelled</option>
-              </Select>
-            </Field>
-          </div>
+                      if (property) {
+                        form.setValue("pricePerNight", property.pricePerNight);
+                        form.setValue("guestCount", property.maxGuests);
+                      }
+                    },
+                  })}
+                >
+                  <option value="">Pilih properti</option>
+                  {properties.map((property) => (
+                    <option key={property.id} value={property.id}>{property.name}</option>
+                  ))}
+                </Select>
+                {selectedProperty ? <p className="text-xs text-muted-foreground">Kapasitas {selectedProperty.maxGuests} tamu</p> : null}
+                {!properties.length ? <FieldError>Belum ada properti aktif. Tambahkan properti dulu.</FieldError> : null}
+              </Field>
+              <Field>
+                <Label htmlFor="checkIn">Check-in</Label>
+                <DatePicker
+                  value={values.checkIn}
+                  placeholder="Pilih tanggal check-in"
+                  onChange={(value) => form.setValue("checkIn", value, { shouldDirty: true, shouldValidate: true })}
+                />
+                {form.formState.errors.checkIn ? <FieldError>{form.formState.errors.checkIn.message}</FieldError> : null}
+              </Field>
+              <Field>
+                <Label htmlFor="checkOut">Check-out</Label>
+                <DatePicker
+                  value={values.checkOut}
+                  placeholder="Pilih tanggal check-out"
+                  onChange={(value) => form.setValue("checkOut", value, { shouldDirty: true, shouldValidate: true })}
+                />
+                {form.formState.errors.checkOut ? <FieldError>{form.formState.errors.checkOut.message}</FieldError> : null}
+              </Field>
+              <Field>
+                <Label htmlFor="guestCount">Jumlah tamu</Label>
+                <Input id="guestCount" type="number" min={1} {...form.register("guestCount", { valueAsNumber: true })} />
+                {selectedProperty ? <p className="text-xs text-muted-foreground">Default mengikuti kapasitas {selectedProperty.maxGuests} tamu, masih bisa diedit.</p> : null}
+              </Field>
+            </div>
+          </FormSection>
 
-          <Field>
-            <Label htmlFor="notes">Catatan</Label>
-            <Textarea id="notes" placeholder="Catatan tambahan" {...form.register("notes")} />
-          </Field>
+          <FormSection title="Data tamu" description="Informasi kontak untuk komunikasi booking.">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field>
+                <Label htmlFor="guestName">Nama tamu</Label>
+                <Input id="guestName" placeholder="Contoh: Sari Pratiwi" {...form.register("guestName")} />
+                {form.formState.errors.guestName ? <FieldError>{form.formState.errors.guestName.message}</FieldError> : null}
+              </Field>
+              <Field>
+                <Label htmlFor="guestPhone">Nomor HP</Label>
+                <Input id="guestPhone" dir="ltr" placeholder="Contoh: 081234567890" {...form.register("guestPhone")} />
+                {form.formState.errors.guestPhone ? <FieldError>{form.formState.errors.guestPhone.message}</FieldError> : null}
+              </Field>
+              <Field className="sm:col-span-2">
+                <Label htmlFor="guestEmail">Email (opsional)</Label>
+                <Input id="guestEmail" type="email" placeholder="Opsional" {...form.register("guestEmail")} />
+                {form.formState.errors.guestEmail ? <FieldError>{form.formState.errors.guestEmail.message}</FieldError> : null}
+              </Field>
+            </div>
+          </FormSection>
 
-          <div className="grid gap-2 rounded-2xl bg-muted p-4 text-sm">
-            <div className="flex justify-between gap-4 text-muted-foreground"><span>Total malam</span><strong className="text-foreground">{calculation.totalNights} malam</strong></div>
-            <div className="flex justify-between gap-4 text-muted-foreground"><span>Subtotal</span><strong className="text-foreground">{formatCurrency(calculation.subtotal)}</strong></div>
-            <div className="flex justify-between gap-4 text-muted-foreground"><span>Total tagihan</span><strong className="text-foreground">{formatCurrency(calculation.totalPrice)}</strong></div>
-            <div className="flex justify-between gap-4 text-muted-foreground"><span>Sisa pembayaran</span><strong className="text-foreground">{formatCurrency(calculation.remainingAmount)}</strong></div>
-            <div className="flex justify-between gap-4 text-muted-foreground"><span>Status pembayaran</span><Badge tone={paymentStatusTone(calculation.paymentStatus)}>{paymentStatusLabel(calculation.paymentStatus)}</Badge></div>
-          </div>
+          <FormSection title="Harga & pembayaran" description="Atur tagihan, diskon, dan pembayaran awal.">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field>
+                <Label htmlFor="pricePerNight">Harga per malam</Label>
+                <Input id="pricePerNight" type="number" min={0} {...form.register("pricePerNight", { valueAsNumber: true })} />
+              </Field>
+              <Field>
+                <Label htmlFor="additionalFees">Biaya tambahan</Label>
+                <Input id="additionalFees" type="number" min={0} {...form.register("additionalFees", { valueAsNumber: true })} />
+              </Field>
+              <Field>
+                <Label htmlFor="discount">Diskon</Label>
+                <Input id="discount" type="number" min={0} {...form.register("discount", { valueAsNumber: true })} />
+              </Field>
+              <Field>
+                <Label htmlFor="paidAmount">Jumlah dibayar</Label>
+                <Input id="paidAmount" type="number" min={0} {...form.register("paidAmount", { valueAsNumber: true })} />
+              </Field>
+              <Field className="sm:col-span-2">
+                <Label htmlFor="paymentMethod">Metode pembayaran</Label>
+                <Select id="paymentMethod" {...form.register("paymentMethod")}>
+                  <option value="bank_transfer">Transfer bank</option>
+                  <option value="cash">Tunai</option>
+                  <option value="qris">QRIS</option>
+                  <option value="other">Lainnya</option>
+                </Select>
+              </Field>
+            </div>
+          </FormSection>
+
+          <FormSection title={mode === "edit" ? "Status & catatan" : "Catatan"} description={mode === "edit" ? "Perbarui status booking jika diperlukan." : "Tambahkan informasi khusus untuk booking ini."}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {mode === "edit" ? (
+                <Field>
+                  <Label htmlFor="bookingStatus">Status booking</Label>
+                  <Select id="bookingStatus" {...form.register("bookingStatus")}>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="checked_in">Checked-in</option>
+                    <option value="checked_out">Checked-out</option>
+                    <option value="cancelled">Cancelled</option>
+                  </Select>
+                </Field>
+              ) : null}
+              <Field className={mode === "edit" ? "sm:col-span-2" : "sm:col-span-2"}>
+                <Label htmlFor="notes">Catatan</Label>
+                <Textarea id="notes" placeholder="Catatan tambahan" {...form.register("notes")} />
+              </Field>
+            </div>
+          </FormSection>
+        </ElevatedCard>
+
+        <div className="grid gap-4 lg:sticky lg:top-24">
+          <BookingSummary calculation={calculation} />
 
           {hasConflict ? (
             <p className="rounded-2xl border border-danger/20 bg-red-50 p-3 text-sm font-semibold text-danger">
@@ -326,17 +338,67 @@ export function BookingForm({ mode = "create", bookingId, initialBooking }: Book
             </p>
           ) : null}
 
-          <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={isSubmitting || !properties.length}>
+          <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting || !properties.length}>
             {isSubmitting ? "Menyimpan..." : mode === "edit" ? "Simpan Perubahan" : "Simpan Booking"}
           </Button>
-        </form>
-      </ElevatedCard>
+        </div>
+      </form>
 
       {toast ? (
         <div className="fixed bottom-24 right-4 z-50 rounded-[20px] bg-foreground px-4 py-3 text-sm font-bold text-white shadow-panel lg:bottom-6">
           {toast}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function FormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="grid gap-3 border-b border-border pb-5 last:border-b-0 last:pb-0">
+      <div>
+        <h2 className="text-lg font-black tracking-[-0.03em]">{title}</h2>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function BookingSummary({ calculation }: { calculation: ReturnType<typeof calculateBooking> }) {
+  return (
+    <Card className="grid gap-4 bg-white shadow-panel">
+      <div>
+        <h2 className="text-[22px] font-black tracking-[-0.03em]">Ringkasan</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Total otomatis mengikuti tanggal dan pembayaran.</p>
+      </div>
+      <div className="grid gap-2 rounded-2xl bg-muted p-4 text-sm">
+        <SummaryRow label="Total malam" value={`${calculation.totalNights} malam`} />
+        <SummaryRow label="Subtotal" value={formatCurrency(calculation.subtotal)} />
+        <SummaryRow label="Total tagihan" value={formatCurrency(calculation.totalPrice)} strong />
+        <SummaryRow label="Sisa pembayaran" value={formatCurrency(calculation.remainingAmount)} strong />
+        <div className="flex items-center justify-between gap-4 text-muted-foreground">
+          <span>Status pembayaran</span>
+          <Badge tone={paymentStatusTone(calculation.paymentStatus)}>{paymentStatusLabel(calculation.paymentStatus)}</Badge>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function SummaryRow({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex justify-between gap-4 text-muted-foreground">
+      <span>{label}</span>
+      <strong className={strong ? "text-foreground" : "text-foreground/80"}>{value}</strong>
     </div>
   );
 }

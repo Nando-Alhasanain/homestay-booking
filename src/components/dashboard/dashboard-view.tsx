@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CalendarDays, Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 
 import { BookingCard } from "@/components/booking/booking-card";
 import { Button } from "@/components/ui/button";
@@ -76,14 +76,9 @@ export function DashboardView() {
         title="Dashboard"
         description="Ringkasan booking hari ini."
         action={
-          <>
-            <Button asChild variant="primary">
-              <Link href="/bookings/new"><Plus className="h-4 w-4" /> Booking Baru</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/calendar"><CalendarDays className="h-4 w-4" /> Lihat Kalender</Link>
-            </Button>
-          </>
+          <Button asChild variant="primary" className="hidden lg:inline-flex">
+            <Link href="/bookings/new"><Plus className="h-4 w-4" /> Booking Baru</Link>
+          </Button>
         }
       />
 
@@ -133,6 +128,10 @@ export function DashboardView() {
           </div>
         </Card>
       </div>
+
+      <Button asChild variant="primary" className="fixed bottom-24 right-4 z-50 shadow-panel lg:hidden">
+        <Link href="/bookings/new"><Plus className="h-4 w-4" /> Booking</Link>
+      </Button>
     </>
   );
 }

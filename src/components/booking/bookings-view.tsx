@@ -74,7 +74,7 @@ export function BookingsView() {
         title="Booking"
         description="Kelola daftar booking tamu."
         action={
-          <Button asChild variant="primary">
+          <Button asChild variant="primary" className="hidden lg:inline-flex">
             <Link href="/bookings/new"><Plus className="h-4 w-4" /> Booking Baru</Link>
           </Button>
         }
@@ -119,6 +119,10 @@ export function BookingsView() {
 
         <div className="grid gap-3">{content}</div>
       </Card>
+
+      <Button asChild variant="primary" className="fixed bottom-24 right-4 z-50 shadow-panel lg:hidden">
+        <Link href="/bookings/new"><Plus className="h-4 w-4" /> Booking</Link>
+      </Button>
     </>
   );
 }

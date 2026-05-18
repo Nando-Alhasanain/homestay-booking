@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, type FormEvent, type ReactNode, useState } from "react";
+import { usePathname } from "next/navigation";
+import { type ReactNode } from "react";
 import {
   CalendarDays,
   FileText,
   Home,
   Hotel,
-  Search,
   Settings,
   UserCircle,
 } from "lucide-react";
@@ -44,21 +43,7 @@ function getInitials(user: SessionPayload) {
 
 export function AppShell({ children, user }: { children: ReactNode; user: SessionPayload }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
   const initials = getInitials(user);
-
-  const handleSearch = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      if (searchQuery.trim()) {
-        router.push(`/bookings?search=${encodeURIComponent(searchQuery.trim())}`);
-      } else {
-        router.push("/bookings");
-      }
-    },
-    [router, searchQuery],
-  );
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -101,23 +86,7 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
       </aside>
 
       <main className="min-w-0 px-4 pb-24 pt-0 lg:px-7 lg:pb-10">
-        <header className="sticky top-0 z-20 -mx-4 mb-5 flex items-center justify-between gap-3 border-b border-border/75 bg-background/90 px-4 py-3 backdrop-blur-xl lg:-mx-7 lg:mb-7 lg:px-7 lg:py-4">
-          <form
-            onSubmit={handleSearch}
-            className="flex h-12 min-w-0 flex-1 items-center gap-3 rounded-full border border-border bg-white px-4 shadow-sm md:max-w-xl"
-          >
-            <input
-              type="text"
-              placeholder="Cari booking"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              className="min-w-0 flex-1 bg-transparent text-sm font-bold text-foreground outline-none placeholder:text-muted-foreground"
-            />
-            <button type="submit" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary text-white">
-              <Search className="h-4 w-4" />
-            </button>
-          </form>
-
+        <header className="sticky top-0 z-20 -mx-4 mb-5 flex items-center justify-end gap-3 border-b border-border/75 bg-background/90 px-4 py-3 backdrop-blur-xl lg:-mx-7 lg:mb-7 lg:px-7 lg:py-4">
           <Link
             href="/settings"
             className="flex min-h-11 items-center gap-2 rounded-full border border-border bg-white p-1 pr-3"
@@ -137,7 +106,7 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
         aria-label="Navigasi mobile"
       >
         {navItems
-          .filter((item) => item.label !== "Properti")
+          .filter((item) => item.label !== "Pengaturan")
           .map((item) => {
             const Icon = item.icon;
             const active = isActive(pathname, item.href);

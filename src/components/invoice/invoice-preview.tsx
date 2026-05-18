@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Download, MessageCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -26,13 +25,6 @@ export function InvoicePreview({
   property: Property;
   shareUrl: string;
 }) {
-  const [toast, setToast] = useState("");
-
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(""), 2200);
-  }
-
   return (
     <div className="relative grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.75fr)]">
       <article className="min-h-[420px] rounded-[20px] border border-border bg-white p-5 md:p-6">
@@ -98,7 +90,7 @@ export function InvoicePreview({
         <div className="divide-y divide-border border-y border-border">
           <div className="grid gap-1 py-3 sm:grid-cols-[120px_1fr]"><span className="text-sm text-muted-foreground">PDF</span><strong className="break-all">{invoice.pdfUrl ?? "Belum tersedia"}</strong></div>
           <div className="grid gap-1 py-3 sm:grid-cols-[120px_1fr]"><span className="text-sm text-muted-foreground">Generate ulang</span><strong>Tersedia dari detail booking</strong></div>
-          <div className="grid gap-1 py-3 sm:grid-cols-[120px_1fr]"><span className="text-sm text-muted-foreground">Share</span><strong>Link WhatsApp dengan pesan otomatis</strong></div>
+          <div className="grid gap-1 py-3 sm:grid-cols-[120px_1fr]"><span className="text-sm text-muted-foreground">Chat</span><strong>Buka WhatsApp pelanggan</strong></div>
         </div>
         <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
           <Button asChild>
@@ -107,24 +99,15 @@ export function InvoicePreview({
               Download PDF
             </a>
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              void navigator.clipboard?.writeText(shareUrl);
-              showToast("Tautan WhatsApp invoice siap dibagikan.");
-            }}
-          >
-            <MessageCircle className="h-4 w-4" />
-            Share WhatsApp
+          <Button asChild variant="primary">
+            <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="h-4 w-4" />
+              Chat WhatsApp
+            </a>
           </Button>
         </div>
       </ElevatedCard>
 
-      {toast ? (
-        <div className="fixed bottom-24 right-4 z-50 rounded-[20px] bg-foreground px-4 py-3 text-sm font-bold text-white shadow-panel lg:bottom-6">
-          {toast}
-        </div>
-      ) : null}
     </div>
   );
 }

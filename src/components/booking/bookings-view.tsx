@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Filter, Plus } from "lucide-react";
 
 import { BookingCard } from "@/components/booking/booking-card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ export function BookingsView() {
   const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
   const [status, setStatus] = useState(() => searchParams.get("status") ?? "all");
   const [paymentStatus, setPaymentStatus] = useState(() => searchParams.get("payment_status") ?? "all");
+  const [showFilters, setShowFilters] = useState(() => Boolean(searchParams.get("search") || searchParams.get("status") || searchParams.get("payment_status")));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -65,6 +66,7 @@ export function BookingsView() {
     if (!bookings.length) return <p className="text-sm text-muted-foreground">Belum ada booking yang sesuai filter.</p>;
     return bookings.map((booking) => <BookingCard key={booking.id} booking={booking} />);
   }, [bookings, error, isLoading]);
+  const activeFilterCount = [search, status !== "all", paymentStatus !== "all"].filter(Boolean).length;
 
   return (
     <>
@@ -79,23 +81,42 @@ export function BookingsView() {
       />
 
       <Card>
-        <div className="mb-4 grid gap-2 sm:grid-cols-3">
-          <Input placeholder="Cari nama tamu" value={search} onChange={(event) => setSearch(event.target.value)} />
-          <Select value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="all">Semua status booking</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="pending">Pending</option>
-            <option value="checked_in">Checked-in</option>
-            <option value="checked_out">Checked-out</option>
-            <option value="cancelled">Cancelled</option>
-          </Select>
-          <Select value={paymentStatus} onChange={(event) => setPaymentStatus(event.target.value)}>
-            <option value="all">Semua pembayaran</option>
-            <option value="paid">Lunas</option>
-            <option value="partial">Sebagian</option>
-            <option value="unpaid">Belum bayar</option>
-          </Select>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-black tracking-[-0.03em]">Daftar booking</h2>
+            <p className="text-sm text-muted-foreground">{bookings.length} booking ditampilkan</p>
+          </div>
+          <Button
+            type="button"
+            variant={showFilters || activeFilterCount > 0 ? "primary" : "default"}
+            onClick={() => setShowFilters((value) => !value)}
+            aria-expanded={showFilters}
+          >
+            <Filter className="h-4 w-4" />
+            Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+          </Button>
         </div>
+
+        {showFilters ? (
+          <div className="mb-4 grid gap-2 rounded-[20px] border border-border bg-muted p-3 sm:grid-cols-3">
+            <Input placeholder="Cari nama tamu" value={search} onChange={(event) => setSearch(event.target.value)} />
+            <Select value={status} onChange={(event) => setStatus(event.target.value)}>
+              <option value="all">Semua status booking</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="pending">Pending</option>
+              <option value="checked_in">Checked-in</option>
+              <option value="checked_out">Checked-out</option>
+              <option value="cancelled">Cancelled</option>
+            </Select>
+            <Select value={paymentStatus} onChange={(event) => setPaymentStatus(event.target.value)}>
+              <option value="all">Semua pembayaran</option>
+              <option value="paid">Lunas</option>
+              <option value="partial">Sebagian</option>
+              <option value="unpaid">Belum bayar</option>
+            </Select>
+          </div>
+        ) : null}
+
         <div className="grid gap-3">{content}</div>
       </Card>
     </>

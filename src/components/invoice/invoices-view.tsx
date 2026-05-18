@@ -15,6 +15,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateRange,
+  getWhatsAppInvoiceUrl,
   paymentStatusLabel,
   paymentStatusTone,
 } from "@/lib/utils";
@@ -110,6 +111,8 @@ export function InvoicesView() {
 }
 
 function InvoiceCard({ invoice }: { invoice: InvoiceListItem }) {
+  const whatsAppUrl = getWhatsAppInvoiceUrl(invoice.guestPhone);
+
   return (
     <div className="grid gap-3 rounded-[18px] border border-border bg-white p-4 sm:grid-cols-[minmax(0,1fr)_auto]">
       <div className="min-w-0">
@@ -138,14 +141,10 @@ function InvoiceCard({ invoice }: { invoice: InvoiceListItem }) {
               <Download className="h-3.5 w-3.5" />
             </a>
           </Button>
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => {
-              void navigator.clipboard?.writeText(`${window.location.origin}/invoices/${invoice.id}`);
-            }}
-          >
-            <MessageCircle className="h-3.5 w-3.5" />
+          <Button asChild size="sm" variant="default" aria-label={`Chat WhatsApp ${invoice.guestName}`}>
+            <a href={whatsAppUrl} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="h-3.5 w-3.5" />
+            </a>
           </Button>
         </div>
       </div>

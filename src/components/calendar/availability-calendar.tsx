@@ -7,7 +7,6 @@ import { addDays, addMonths, endOfMonth, format, getDay, parseISO, startOfMonth,
 import { id } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -266,20 +265,14 @@ export function AvailabilityCalendar() {
               <>
                 <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full", booked && "bg-white text-primary shadow-sm", isBlockedOnly && "bg-white text-warning shadow-sm")}>{format(date, "d", { locale: id })}</span>
                 {booked ? (
-                  <div className="mt-1.5 space-y-1">
-                    <span className="inline-flex rounded-full bg-primary px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-white">
-                      Terisi
-                    </span>
+                  <div className="mt-1.5">
                     <small className="line-clamp-2 block text-xs font-semibold leading-4 text-foreground/80">
                       {booked.guestName}
                     </small>
                   </div>
                 ) : null}
                 {isBlockedOnly ? (
-                  <div className="mt-1.5 space-y-1">
-                    <span className="inline-flex rounded-full bg-warning px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-white">
-                      Diblokir
-                    </span>
+                  <div className="mt-1.5">
                     <small className="line-clamp-2 block text-xs font-semibold leading-4 text-foreground/80">
                       {blocked.reason || "Tidak tersedia"}
                     </small>
@@ -293,7 +286,7 @@ export function AvailabilityCalendar() {
             ) : isBlockedOnly ? (
               <div key={day.date} className={className}>{content}</div>
             ) : (
-              <Link key={day.date} href="/bookings/new" className={className}>{content}</Link>
+              <div key={day.date} className={className}>{content}</div>
             );
           })}
         </div>
@@ -308,7 +301,10 @@ export function AvailabilityCalendar() {
           <span className="h-2.5 w-2.5 rounded-full bg-warning" />
           Tanggal diblokir
         </span>
-        <Badge tone="neutral">Tanggal kosong normal</Badge>
+        <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-muted px-3 py-1.5 text-xs font-bold text-muted-foreground">
+          <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground" />
+          Tanggal kosong normal
+        </span>
       </div>
 
       <div className="grid gap-4 border-t border-border p-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(320px,1fr)]">

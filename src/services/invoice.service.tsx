@@ -6,7 +6,7 @@ import path from "node:path";
 import { getDb } from "@/db";
 import { bookings, invoices, properties } from "@/db/schema";
 import { ApiError } from "@/lib/api-response";
-import { getAppUrl, getInvoiceStoragePath } from "@/lib/env";
+import { getInvoiceStoragePath } from "@/lib/env";
 import { getWhatsAppInvoiceUrl } from "@/lib/utils";
 import { InvoiceDocument } from "@/services/invoice-document";
 
@@ -109,11 +109,9 @@ export async function getInvoiceById(id: string) {
     throw new ApiError("INVOICE_NOT_FOUND", "Invoice tidak ditemukan.", 404);
   }
 
-  const invoiceUrl = `${getAppUrl()}${row.invoice.pdfUrl ?? `/api/invoices/${id}/download`}`;
-
   return {
     ...row,
-    shareUrl: getWhatsAppInvoiceUrl(row.booking.guestPhone, invoiceUrl),
+    shareUrl: getWhatsAppInvoiceUrl(row.booking.guestPhone),
   };
 }
 

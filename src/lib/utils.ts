@@ -110,11 +110,17 @@ export function bookingStatusTone(
   return "neutral";
 }
 
-export function getWhatsAppInvoiceUrl(phone: string, invoiceUrl: string) {
-  const normalizedPhone = phone.replace(/\D/g, "").replace(/^0/, "62");
-  const text = encodeURIComponent(
-    `Halo, berikut invoice booking homestay Anda: ${invoiceUrl}`,
-  );
+export function normalizeWhatsAppPhone(phone: string) {
+  let normalized = phone.replace(/\D/g, "");
 
-  return `https://wa.me/${normalizedPhone}?text=${text}`;
+  if (normalized.startsWith("00")) normalized = normalized.slice(2);
+  if (normalized.startsWith("0")) return `62${normalized.slice(1)}`;
+  if (normalized.startsWith("62")) return normalized;
+  if (normalized.startsWith("8")) return `62${normalized}`;
+
+  return normalized;
+}
+
+export function getWhatsAppInvoiceUrl(phone: string) {
+  return `https://wa.me/${normalizeWhatsAppPhone(phone)}`;
 }

@@ -79,6 +79,16 @@ async function runMigrations() {
       "created_at" timestamp DEFAULT now() NOT NULL,
       "updated_at" timestamp DEFAULT now() NOT NULL
     )`,
+    `CREATE TABLE IF NOT EXISTS "blocked_dates" (
+      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+      "property_id" uuid NOT NULL,
+      "start_date" date NOT NULL,
+      "end_date" date NOT NULL,
+      "reason" text,
+      "created_at" timestamp DEFAULT now() NOT NULL,
+      "updated_at" timestamp DEFAULT now() NOT NULL
+    )`,
+    `CREATE INDEX IF NOT EXISTS "blocked_dates_property_id_idx" ON "blocked_dates" ("property_id")`,
     `CREATE TABLE IF NOT EXISTS "invoices" (
       "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
       "booking_id" uuid NOT NULL,
@@ -114,6 +124,11 @@ async function runMigrations() {
     `DO $$ BEGIN
       IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'invoices_booking_id_bookings_id_fk') THEN
         ALTER TABLE "invoices" ADD CONSTRAINT "invoices_booking_id_bookings_id_fk" FOREIGN KEY ("booking_id") REFERENCES "bookings"("id") ON DELETE no action ON UPDATE no action;
+      END IF;
+    END $$`,
+    `DO $$ BEGIN
+      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'blocked_dates_property_id_properties_id_fk') THEN
+        ALTER TABLE "blocked_dates" ADD CONSTRAINT "blocked_dates_property_id_properties_id_fk" FOREIGN KEY ("property_id") REFERENCES "properties"("id") ON DELETE cascade ON UPDATE no action;
       END IF;
     END $$`,
     `DO $$ BEGIN

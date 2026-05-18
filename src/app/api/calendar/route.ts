@@ -1,5 +1,6 @@
 import { handleApiError, jsonOk } from "@/lib/api-response";
 import { requireUser } from "@/lib/auth";
+import { expandCalendarBlocks, listCalendarBlocks } from "@/services/calendar-block.service";
 import { listCalendarDates } from "@/services/booking.service";
 import { calendarQuerySchema } from "@/validators/query.validator";
 
@@ -13,7 +14,16 @@ export async function GET(request: Request) {
       year: searchParams.get("year"),
     });
 
-    return jsonOk({ booked_dates: await listCalendarDates(query) });
+    const [bookedDates, blocks] = await Promise.all([
+      listCalendarDates(query),
+      listCalendarBlocks(query),
+    ]);
+
+    return jsonOk({
+      booked_dates: bookedDates,
+      blocked_dates: expandCalendarBlocks(blocks, query),
+      date_blocks: blocks,
+    });
   } catch (error) {
     return handleApiError(error);
   }

@@ -79,6 +79,24 @@ export const bookings = pgTable("bookings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const blockedDates = pgTable(
+  "blocked_dates",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    propertyId: uuid("property_id")
+      .notNull()
+      .references(() => properties.id, { onDelete: "cascade" }),
+    startDate: date("start_date", { mode: "string" }).notNull(),
+    endDate: date("end_date", { mode: "string" }).notNull(),
+    reason: text("reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    propertyIdIdx: index("blocked_dates_property_id_idx").on(table.propertyId),
+  }),
+);
+
 export const invoices = pgTable("invoices", {
   id: uuid("id").defaultRandom().primaryKey(),
   bookingId: uuid("booking_id")
@@ -99,5 +117,7 @@ export type PropertyRow = typeof properties.$inferSelect;
 export type NewProperty = typeof properties.$inferInsert;
 export type BookingRow = typeof bookings.$inferSelect;
 export type NewBooking = typeof bookings.$inferInsert;
+export type BlockedDateRow = typeof blockedDates.$inferSelect;
+export type NewBlockedDate = typeof blockedDates.$inferInsert;
 export type InvoiceRow = typeof invoices.$inferSelect;
 export type NewInvoice = typeof invoices.$inferInsert;

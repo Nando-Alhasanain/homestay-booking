@@ -1,6 +1,6 @@
 import { handleApiError, jsonOk } from "@/lib/api-response";
 import { requireUser } from "@/lib/auth";
-import { deactivateProperty, getPropertyById, updateProperty } from "@/services/property.service";
+import { deleteOrDeactivateProperty, getPropertyById, updateProperty } from "@/services/property.service";
 import { updatePropertySchema } from "@/validators/property.validator";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -28,7 +28,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   try {
     await requireUser();
     const { id } = await params;
-    return jsonOk({ property: await deactivateProperty(id) });
+    return jsonOk(await deleteOrDeactivateProperty(id));
   } catch (error) {
     return handleApiError(error);
   }

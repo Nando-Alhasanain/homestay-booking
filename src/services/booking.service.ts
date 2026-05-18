@@ -1,7 +1,7 @@
 import { and, desc, eq, gt, gte, ilike, lt, lte, ne, or, type SQL } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { bookings, invoices, properties } from "@/db/schema";
+import { blockedDates, bookings, invoices, properties } from "@/db/schema";
 import { ApiError } from "@/lib/api-response";
 import { calculateBooking } from "@/lib/utils";
 import { generateInvoiceForBooking } from "@/services/invoice.service";
@@ -122,9 +122,36 @@ export async function assertNoBookingConflict(input: {
   }
 }
 
+async function assertNoBlockedDateConflict(input: {
+  propertyId: string;
+  checkIn: string;
+  checkOut: string;
+}) {
+  const [conflict] = await getDb()
+    .select({ id: blockedDates.id })
+    .from(blockedDates)
+    .where(
+      and(
+        eq(blockedDates.propertyId, input.propertyId),
+        lt(blockedDates.startDate, input.checkOut),
+        gt(blockedDates.endDate, input.checkIn),
+      ),
+    )
+    .limit(1);
+
+  if (conflict) {
+    throw new ApiError("BLOCKED_DATE_CONFLICT", "Tanggal tersebut sedang diblokir.", 409);
+  }
+}
+
 export async function createBooking(input: CreateBookingInput, createdBy?: string) {
   await assertPropertyExists(input.propertyId);
   await assertNoBookingConflict({
+    propertyId: input.propertyId,
+    checkIn: input.checkIn,
+    checkOut: input.checkOut,
+  });
+  await assertNoBlockedDateConflict({
     propertyId: input.propertyId,
     checkIn: input.checkIn,
     checkOut: input.checkOut,
@@ -182,6 +209,11 @@ export async function updateBooking(id: string, input: UpdateBookingInput) {
       checkIn: next.checkIn,
       checkOut: next.checkOut,
       excludeBookingId: id,
+    });
+    await assertNoBlockedDateConflict({
+      propertyId: next.propertyId,
+      checkIn: next.checkIn,
+      checkOut: next.checkOut,
     });
   }
 

@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { properties } from "@/db/schema";
+import { bookings, properties } from "@/db/schema";
 import { ApiError } from "@/lib/api-response";
 import type { CreatePropertyInput, UpdatePropertyInput } from "@/validators/property.validator";
 
@@ -61,4 +61,20 @@ export async function updateProperty(id: string, input: UpdatePropertyInput) {
 
 export async function deactivateProperty(id: string) {
   return updateProperty(id, { status: "inactive" });
+}
+
+export async function deleteOrDeactivateProperty(id: string) {
+  await getPropertyById(id);
+
+  const [{ value }] = await getDb()
+    .select({ value: count() })
+    .from(bookings)
+    .where(eq(bookings.propertyId, id));
+
+  if (value > 0) {
+    return { deleted: false, property: await deactivateProperty(id) };
+  }
+
+  await getDb().delete(properties).where(eq(properties.id, id));
+  return { deleted: true, id };
 }

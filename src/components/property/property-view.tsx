@@ -23,6 +23,7 @@ export function PropertyView() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeactivating, setIsDeactivating] = useState(false);
 
   const property = properties.find((item) => item.id === selectedId) ?? properties[0];
 
@@ -82,6 +83,30 @@ export function PropertyView() {
     }
   }
 
+  async function deactivateSelectedProperty() {
+    if (!property) return;
+    const confirmed = window.confirm(`Nonaktifkan ${property.name}? Properti tetap tersimpan untuk histori booking.`);
+
+    if (!confirmed) return;
+
+    setIsDeactivating(true);
+    setError("");
+
+    try {
+      const response = await fetchJson<{ property: Record<string, unknown> }>(`/api/properties/${property.id}`, {
+        method: "DELETE",
+      });
+      const updated = normalizeProperty(response.property);
+      setProperties((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      setToast("Properti berhasil dinonaktifkan.");
+      window.setTimeout(() => setToast(""), 2200);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Gagal menonaktifkan properti.");
+    } finally {
+      setIsDeactivating(false);
+    }
+  }
+
   if (!property) {
     return (
       <>
@@ -134,11 +159,21 @@ export function PropertyView() {
       <Card className="mt-4">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-[22px] font-black tracking-[-0.03em]">Edit property</h2>
-          {properties.length > 1 ? (
-            <Select className="w-auto min-w-56" value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
-              {properties.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-            </Select>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            {properties.length > 1 ? (
+              <Select className="w-auto min-w-56" value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
+                {properties.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </Select>
+            ) : null}
+            <Button
+              type="button"
+              variant="danger"
+              onClick={deactivateSelectedProperty}
+              disabled={isDeactivating || property.status === "inactive"}
+            >
+              {isDeactivating ? "Menonaktifkan..." : "Nonaktifkan Properti"}
+            </Button>
+          </div>
         </div>
         <form className="grid gap-3 sm:grid-cols-2" onSubmit={saveProperty} key={property.id}>
           <Field><Label>Nama homestay</Label><Input name="name" defaultValue={property.name} /></Field>

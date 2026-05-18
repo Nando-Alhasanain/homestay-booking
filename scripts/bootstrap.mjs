@@ -198,7 +198,6 @@ async function seedProperty(sql) {
   const existingProperties = await sql`
     select id
     from properties
-    where name = 'Homestay Melati'
     limit 1
   `;
 

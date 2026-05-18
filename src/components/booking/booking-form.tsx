@@ -72,7 +72,7 @@ const defaultValues: BookingFormValues = {
   discount: 0,
   paidAmount: 0,
   paymentMethod: "bank_transfer",
-  bookingStatus: "pending",
+  bookingStatus: "confirmed",
   notes: "",
 };
 

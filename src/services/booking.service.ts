@@ -4,7 +4,7 @@ import { getDb } from "@/db";
 import { blockedDates, bookings, invoices, properties } from "@/db/schema";
 import { ApiError } from "@/lib/api-response";
 import { calculateBooking } from "@/lib/utils";
-import { generateInvoiceForBooking } from "@/services/invoice.service";
+import { deleteInvoicesForBooking, generateInvoiceForBooking } from "@/services/invoice.service";
 import type { CreateBookingInput, UpdateBookingInput } from "@/validators/booking.validator";
 import type { bookingQuerySchema } from "@/validators/query.validator";
 import type { z } from "zod";
@@ -268,6 +268,15 @@ export async function cancelBooking(id: string) {
     .returning();
 
   return booking;
+}
+
+export async function deleteBooking(id: string) {
+  const existing = await getBookingById(id);
+
+  await deleteInvoicesForBooking(id);
+  await getDb().delete(bookings).where(eq(bookings.id, id));
+
+  return existing;
 }
 
 export async function listCalendarDates(input: { propertyId: string; month: number; year: number }) {

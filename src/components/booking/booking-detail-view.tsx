@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Download, FileText, MessageCircle, Pencil, XCircle } from "lucide-react";
+import { Download, FileText, MessageCircle, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,18 +48,17 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
     };
   }, [bookingId, router]);
 
-  async function cancelBooking() {
-    if (!booking || !window.confirm("Batalkan booking ini?")) return;
+  async function deleteBooking() {
+    if (!booking || !window.confirm("Hapus booking ini permanen? Data booking dan invoice terkait akan dihapus dari database.")) return;
 
     try {
-      const response = await fetchJson<{ booking: Record<string, unknown> }>(`/api/bookings/${booking.id}`, {
+      await fetchJson<{ booking: Record<string, unknown> }>(`/api/bookings/${booking.id}`, {
         method: "DELETE",
       });
-      setBooking(normalizeBooking(response.booking));
-      setToast("Booking dibatalkan.");
-      window.setTimeout(() => setToast(""), 2200);
+      setToast("Booking dihapus.");
+      window.setTimeout(() => router.push("/bookings"), 600);
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Gagal membatalkan booking.");
+      setError(error instanceof Error ? error.message : "Gagal menghapus booking.");
     }
   }
 
@@ -84,7 +83,7 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
             <Button asChild>
               <Link href={`/bookings/${booking.id}/edit`}><Pencil className="h-4 w-4" /> Edit</Link>
             </Button>
-            <Button variant="danger" onClick={cancelBooking}><XCircle className="h-4 w-4" /> Cancel</Button>
+            <Button variant="danger" onClick={deleteBooking}><Trash2 className="h-4 w-4" /> Hapus</Button>
           </>
         }
       />

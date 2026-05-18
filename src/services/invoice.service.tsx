@@ -1,6 +1,6 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { count, desc, eq, ilike, or } from "drizzle-orm";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { getDb } from "@/db";
@@ -129,6 +129,30 @@ export async function readInvoicePdf(id: string) {
   const buffer = await readFile(filePath);
 
   return { buffer, fileName };
+}
+
+export async function deleteInvoicesForBooking(bookingId: string) {
+  const rows = await getDb().select().from(invoices).where(eq(invoices.bookingId, bookingId));
+
+  if (!rows.length) return [];
+
+  await getDb().delete(invoices).where(eq(invoices.bookingId, bookingId));
+
+  await Promise.all(
+    rows.map(async (invoice) => {
+      if (!invoice.pdfUrl) return;
+
+      try {
+        await unlink(path.join(resolveStoragePath(), path.basename(invoice.pdfUrl)));
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+          console.warn(`Gagal menghapus file invoice ${invoice.pdfUrl}`, error);
+        }
+      }
+    }),
+  );
+
+  return rows;
 }
 
 export type ListInvoiceRow = {

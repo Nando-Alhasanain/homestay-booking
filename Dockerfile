@@ -1,13 +1,13 @@
+# syntax=docker/dockerfile:1.7
+
 FROM node:22-alpine AS base
 WORKDIR /app
 
-FROM base AS deps
-COPY package.json package-lock.json ./
-RUN npm ci
-
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=deps /app/node_modules ./node_modules
+ENV NODE_OPTIONS=--max-old-space-size=1536
+COPY package.json package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --fund=false
 COPY . .
 RUN npm run build
 
@@ -28,8 +28,8 @@ COPY --chown=nextjs:nodejs --from=builder /app/.next/standalone ./
 COPY --chown=nextjs:nodejs --from=builder /app/.next/static ./.next/static
 COPY --chown=nextjs:nodejs --from=builder /app/package.json ./package.json
 COPY --chown=nextjs:nodejs --from=builder /app/package-lock.json ./package-lock.json
-COPY --chown=nextjs:nodejs --from=deps /app/node_modules/bcryptjs ./node_modules/bcryptjs
-COPY --chown=nextjs:nodejs --from=deps /app/node_modules/postgres ./node_modules/postgres
+COPY --chown=nextjs:nodejs --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
+COPY --chown=nextjs:nodejs --from=builder /app/node_modules/postgres ./node_modules/postgres
 COPY --chown=nextjs:nodejs --from=builder /app/scripts ./scripts
 COPY --chown=nextjs:nodejs --from=builder /app/start.sh ./start.sh
 

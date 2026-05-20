@@ -17,6 +17,7 @@ import {
   formatDateRange,
   paymentStatusLabel,
   paymentStatusTone,
+  getWhatsAppInvoiceUrl,
 } from "@/lib/utils";
 import type { Booking } from "@/types";
 
@@ -71,6 +72,7 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
   }
 
   const invoiceDownloadUrl = booking.invoiceId ? `/api/invoices/${booking.invoiceId}/download` : "#";
+  const whatsAppUrl = getWhatsAppInvoiceUrl(booking.guestPhone);
 
   return (
     <>
@@ -121,15 +123,10 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
             <Button asChild disabled={!booking.invoiceId}>
               <a href={invoiceDownloadUrl}><Download className="h-4 w-4" /> Download Invoice</a>
             </Button>
-            <Button
-              onClick={() => {
-                if (!booking.invoiceId) return;
-                void navigator.clipboard?.writeText(`${window.location.origin}/invoices/${booking.invoiceId}`);
-                setToast("Link invoice disalin.");
-                window.setTimeout(() => setToast(""), 2200);
-              }}
-            >
-              <MessageCircle className="h-4 w-4" /> Share WhatsApp
+            <Button asChild variant="whatsapp">
+              <a href={whatsAppUrl} target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="h-4 w-4" /> Chat WhatsApp
+              </a>
             </Button>
           </div>
         </Card>

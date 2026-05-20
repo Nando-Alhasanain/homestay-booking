@@ -1,7 +1,7 @@
 import { handleApiError, jsonOk } from "@/lib/api-response";
 import { requireUser } from "@/lib/auth";
 import { expandCalendarBlocks, listCalendarBlocks } from "@/services/calendar-block.service";
-import { listCalendarDates } from "@/services/booking.service";
+import { listCalendarBookingEvents, listCalendarDates } from "@/services/booking.service";
 import { calendarQuerySchema } from "@/validators/query.validator";
 
 export async function GET(request: Request) {
@@ -14,13 +14,15 @@ export async function GET(request: Request) {
       year: searchParams.get("year"),
     });
 
-    const [bookedDates, blocks] = await Promise.all([
+    const [bookedDates, bookingEvents, blocks] = await Promise.all([
       listCalendarDates(query),
+      listCalendarBookingEvents(query),
       listCalendarBlocks(query),
     ]);
 
     return jsonOk({
       booked_dates: bookedDates,
+      booking_events: bookingEvents,
       blocked_dates: expandCalendarBlocks(blocks, query),
       date_blocks: blocks,
     });

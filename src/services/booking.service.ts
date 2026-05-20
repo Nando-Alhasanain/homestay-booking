@@ -1,4 +1,5 @@
 import { and, desc, eq, gt, gte, ilike, lt, lte, ne, or, type SQL } from "drizzle-orm";
+import { format } from "date-fns";
 
 import { getDb } from "@/db";
 import { blockedDates, bookings, invoices, properties } from "@/db/schema";
@@ -303,7 +304,7 @@ export async function listCalendarDates(input: { propertyId: string; month: numb
     const end = new Date(`${booking.checkOut}T00:00:00`);
 
     while (cursor < end) {
-      const date = cursor.toISOString().slice(0, 10);
+      const date = format(cursor, "yyyy-MM-dd");
       if (date >= monthStart && date < monthEnd) {
         dates.push({
           date,
@@ -316,5 +317,56 @@ export async function listCalendarDates(input: { propertyId: string; month: numb
     }
 
     return dates;
+  });
+}
+
+export async function listCalendarBookingEvents(input: { propertyId: string; month: number; year: number }) {
+  const monthStart = `${input.year}-${String(input.month).padStart(2, "0")}-01`;
+  const nextMonth = input.month === 12 ? 1 : input.month + 1;
+  const nextMonthYear = input.month === 12 ? input.year + 1 : input.year;
+  const monthEnd = `${nextMonthYear}-${String(nextMonth).padStart(2, "0")}-01`;
+
+  const rows = await getDb()
+    .select()
+    .from(bookings)
+    .where(
+      and(
+        eq(bookings.propertyId, input.propertyId),
+        ne(bookings.bookingStatus, "cancelled"),
+        lt(bookings.checkIn, monthEnd),
+        gt(bookings.checkOut, monthStart),
+      ),
+    );
+
+  return rows.flatMap((booking) => {
+    const events: Array<{
+      date: string;
+      type: "check_in" | "check_out";
+      bookingId: string;
+      guestName: string;
+      status: string;
+    }> = [];
+
+    if (booking.checkIn >= monthStart && booking.checkIn < monthEnd) {
+      events.push({
+        date: booking.checkIn,
+        type: "check_in",
+        bookingId: booking.id,
+        guestName: booking.guestName,
+        status: booking.bookingStatus,
+      });
+    }
+
+    if (booking.checkOut >= monthStart && booking.checkOut < monthEnd) {
+      events.push({
+        date: booking.checkOut,
+        type: "check_out",
+        bookingId: booking.id,
+        guestName: booking.guestName,
+        status: booking.bookingStatus,
+      });
+    }
+
+    return events;
   });
 }

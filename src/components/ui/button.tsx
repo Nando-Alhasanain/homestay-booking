@@ -14,6 +14,7 @@ const buttonVariants = cva(
           "border-primary bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
         ghost: "border-transparent bg-transparent text-foreground hover:bg-muted",
         danger: "border-danger bg-danger text-white hover:bg-danger/90",
+        whatsapp: "border-[#25D366] bg-[#25D366] text-white shadow-sm hover:bg-[#1ebe5d]",
       },
       size: {
         default: "min-h-11 px-4",

@@ -1,4 +1,5 @@
 import { and, eq, gt, lt } from "drizzle-orm";
+import { format } from "date-fns";
 
 import { getDb } from "@/db";
 import { blockedDates } from "@/db/schema";
@@ -97,7 +98,7 @@ export function expandCalendarBlocks(
     const end = new Date(`${block.endDate}T00:00:00`);
 
     while (cursor < end) {
-      const date = cursor.toISOString().slice(0, 10);
+      const date = format(cursor, "yyyy-MM-dd");
       if (date >= monthStart && date < monthEnd) {
         dates.push({ date, blockId: block.id, reason: block.reason });
       }

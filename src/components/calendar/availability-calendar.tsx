@@ -69,6 +69,14 @@ type BookedDate = {
   status: string;
 };
 
+type BookingEvent = {
+  date: string;
+  type: "check_in" | "check_out";
+  bookingId: string;
+  guestName: string;
+  status: string;
+};
+
 type BlockedDate = {
   date: string;
   blockId: string;
@@ -139,6 +147,7 @@ export function AvailabilityCalendar() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [propertyId, setPropertyId] = useState("");
   const [bookedDates, setBookedDates] = useState<BookedDate[]>([]);
+  const [bookingEvents, setBookingEvents] = useState<BookingEvent[]>([]);
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [dateBlocks, setDateBlocks] = useState<DateBlock[]>([]);
   const [error, setError] = useState("");
@@ -188,9 +197,10 @@ export function AvailabilityCalendar() {
           month: String(monthDate.getMonth() + 1),
           year: String(monthDate.getFullYear()),
         });
-        const response = await fetchJson<{ booked_dates: BookedDate[]; blocked_dates: BlockedDate[]; date_blocks: DateBlock[] }>(`/api/calendar?${params.toString()}`);
+        const response = await fetchJson<{ booked_dates: BookedDate[]; booking_events: BookingEvent[]; blocked_dates: BlockedDate[]; date_blocks: DateBlock[] }>(`/api/calendar?${params.toString()}`);
         if (!cancelled) {
           setBookedDates(response.booked_dates);
+          setBookingEvents(response.booking_events ?? []);
           setBlockedDates(response.blocked_dates);
           setDateBlocks(response.date_blocks);
         }
@@ -213,6 +223,17 @@ export function AvailabilityCalendar() {
 
   const days = useMemo(() => buildCalendarDays(monthDate), [monthDate]);
   const bookedMap = useMemo(() => new Map(bookedDates.map((date) => [date.date, date])), [bookedDates]);
+  const eventMap = useMemo(() => {
+    const map = new Map<string, BookingEvent[]>();
+
+    for (const event of bookingEvents) {
+      const events = map.get(event.date) ?? [];
+      events.push(event);
+      map.set(event.date, events);
+    }
+
+    return map;
+  }, [bookingEvents]);
   const blockedMap = useMemo(() => new Map(blockedDates.map((date) => [date.date, date])), [blockedDates]);
 
   async function createDateBlock(event: React.FormEvent<HTMLFormElement>) {
@@ -303,6 +324,7 @@ export function AvailabilityCalendar() {
           {days.map((day, index) => {
             const booked = bookedMap.get(day.date);
             const blocked = blockedMap.get(day.date);
+            const events = eventMap.get(day.date) ?? [];
             const bookingColor = booked ? getBookingColor(booked.bookingId) : null;
             const date = new Date(`${day.date}T00:00:00`);
             const isBlockedOnly = !booked && blocked;
@@ -330,6 +352,27 @@ export function AvailabilityCalendar() {
                     <small className="relative z-10 line-clamp-2 block text-xs font-semibold leading-4 text-white/80">
                       {blocked.reason || "Tidak tersedia"}
                     </small>
+                  </div>
+                ) : null}
+                {events.length ? (
+                  <div className="absolute right-1 top-1 z-10 flex flex-col items-end gap-0.5 sm:right-2 sm:top-2">
+                    {events.slice(0, 2).map((event) => {
+                      const eventColor = getBookingColor(event.bookingId);
+                      const eventLabel = event.type === "check_in" ? "In" : "Out";
+
+                      return (
+                        <span
+                          key={`${event.bookingId}-${event.type}`}
+                          title={`${eventLabel} - ${event.guestName}`}
+                          className={cn(
+                            "rounded-full border bg-white px-1 py-0.5 text-[8px] font-black leading-none shadow-sm sm:px-1.5 sm:text-[9px]",
+                            eventColor.date,
+                          )}
+                        >
+                          {eventLabel}
+                        </span>
+                      );
+                    })}
                   </div>
                 ) : null}
               </>

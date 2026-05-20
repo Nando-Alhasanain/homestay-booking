@@ -171,7 +171,7 @@ export function InvoicePreview({
             <Share2 className="h-4 w-4" />
             {isSharing ? "Menyiapkan..." : "Share Invoice"}
           </Button>
-          <Button asChild variant="primary">
+          <Button asChild variant="whatsapp">
             <a href={shareUrl} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="h-4 w-4" />
               Chat WhatsApp

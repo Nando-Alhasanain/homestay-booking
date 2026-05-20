@@ -231,7 +231,7 @@ export const Select = React.forwardRef<
           onClick={() => setOpen((prev) => !prev)}
           onKeyDown={handleTriggerKeyDown}
           className={cn(
-            "min-h-[46px] w-full rounded-xl border border-border bg-white px-3.5 py-3 text-sm text-left outline-none transition flex items-center justify-between gap-2",
+            "min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 py-3 text-sm text-left outline-none transition flex items-center justify-between gap-2",
             "focus-visible:border-foreground focus-visible:ring-2 focus-visible:ring-foreground",
             open && "border-foreground ring-2 ring-foreground",
             disabled && "opacity-50 cursor-not-allowed",
@@ -250,7 +250,7 @@ export const Select = React.forwardRef<
 
         <div
           className={cn(
-            "absolute left-0 right-0 z-50 mt-1 rounded-2xl border border-border bg-white py-1 shadow-panel origin-top transition-all duration-200 ease-out",
+            "absolute left-0 right-0 z-50 mt-1 rounded-2xl border border-border bg-card py-1 shadow-panel origin-top transition-all duration-200 ease-out",
             open
               ? "visible opacity-100 translate-y-0 scale-100"
               : "invisible opacity-0 -translate-y-1 scale-95 pointer-events-none",

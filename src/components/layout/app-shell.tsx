@@ -83,7 +83,7 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col gap-7 border-r border-border bg-white px-5 py-7 lg:flex">
+      <aside className="sticky top-0 hidden h-screen flex-col gap-7 border-r border-border bg-card px-5 py-7 lg:flex">
         <Link href="/dashboard" className="flex items-center gap-3 font-black tracking-[-0.02em]">
           <Image
             src="/logo.png"
@@ -110,7 +110,7 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
                 href={item.href}
                 className={cn(
                   "flex min-h-12 items-center gap-3 rounded-[20px] px-3.5 py-3 text-sm font-bold transition hover:bg-muted",
-                  active && "bg-foreground text-white hover:bg-foreground",
+                  active && "bg-foreground text-background hover:bg-foreground",
                 )}
               >
                 <Icon className="h-5 w-5" />
@@ -134,9 +134,9 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
 
           <Link
             href="/settings"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white p-1 md:w-auto md:justify-start md:gap-2 md:pr-3"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card p-1 md:w-auto md:justify-start md:gap-2 md:pr-3"
           >
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-foreground text-xs font-black text-white">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-foreground text-xs font-black text-background">
               {initials}
             </span>
             <span className="hidden max-w-40 truncate text-sm font-bold md:block">{user.name}</span>
@@ -147,7 +147,7 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
       </main>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-white px-2 py-1.5 pb-[calc(0.4rem+env(safe-area-inset-bottom))] lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-card px-2 py-1.5 pb-[calc(0.4rem+env(safe-area-inset-bottom))] lg:hidden"
         aria-label="Navigasi mobile"
       >
         {navItems
@@ -162,7 +162,7 @@ export function AppShell({ children, user }: { children: ReactNode; user: Sessio
                 href={item.href}
                 className={cn(
                   "flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-bold text-muted-foreground",
-                  active && "text-primary",
+                  active && "bg-primary/10 text-primary",
                 )}
               >
                 <Icon className="h-5 w-5" />

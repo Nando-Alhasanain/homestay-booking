@@ -22,9 +22,9 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
         caption_label: "text-sm font-black",
         nav: "space-x-1 flex items-center",
         button_previous:
-          "absolute left-1 h-8 w-8 rounded-full border border-border bg-white p-0 opacity-80 hover:opacity-100",
+          "absolute left-1 h-8 w-8 rounded-full border border-border bg-card p-0 opacity-80 hover:opacity-100",
         button_next:
-          "absolute right-1 h-8 w-8 rounded-full border border-border bg-white p-0 opacity-80 hover:opacity-100",
+          "absolute right-1 h-8 w-8 rounded-full border border-border bg-card p-0 opacity-80 hover:opacity-100",
         month_grid: "w-full border-collapse space-y-1",
         weekdays: "flex",
         weekday: "w-9 rounded-md text-[0.8rem] font-bold text-muted-foreground",

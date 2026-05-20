@@ -209,7 +209,7 @@ export function PropertyView() {
               sizes="(min-width: 1024px) 720px, 100vw"
               className="object-cover"
             />
-            <div className="relative z-10 max-w-sm rounded-[18px] border border-border bg-white/90 p-4 backdrop-blur">
+            <div className="relative z-10 max-w-sm rounded-[18px] border border-border bg-card/90 p-4 backdrop-blur">
               <h2 className="text-[22px] font-black tracking-[-0.03em]">{property.name}</h2>
               <p className="mt-1 text-sm leading-6 text-muted-foreground">{property.address ?? "Alamat belum diisi"}</p>
             </div>

@@ -17,6 +17,21 @@
   --danger: 12 81% 42%;
 }
 
+.dark {
+  --background: 220 18% 7%;
+  --foreground: 210 20% 96%;
+  --card: 220 16% 11%;
+  --card-foreground: 210 20% 96%;
+  --muted: 220 14% 16%;
+  --muted-foreground: 215 12% 68%;
+  --border: 220 13% 22%;
+  --primary: 348 100% 64%;
+  --primary-foreground: 0 0% 100%;
+  --success: 142 66% 45%;
+  --warning: 38 92% 52%;
+  --danger: 8 86% 62%;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -60,4 +75,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 6px 6px 0 0;
   background: hsl(var(--foreground));
   opacity: 0.92;
+}
+
+.dark .bg-red-50 {
+  background-color: hsl(var(--danger) / 0.12);
 }

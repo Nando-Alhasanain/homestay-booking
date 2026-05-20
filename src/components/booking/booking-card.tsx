@@ -15,7 +15,7 @@ export function BookingCard({ booking }: { booking: Booking }) {
   return (
     <Link
       href={`/bookings/${booking.id}`}
-      className="grid gap-3 rounded-[18px] border border-border bg-white p-4 transition hover:border-foreground/40 sm:grid-cols-[minmax(0,1fr)_auto]"
+      className="grid gap-3 rounded-[18px] border border-border bg-card p-4 transition hover:border-foreground/40 sm:grid-cols-[minmax(0,1fr)_auto]"
     >
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">

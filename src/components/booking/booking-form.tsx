@@ -375,7 +375,7 @@ function FormSection({
 
 function BookingSummary({ calculation }: { calculation: ReturnType<typeof calculateBooking> }) {
   return (
-    <Card className="grid gap-4 bg-white shadow-panel">
+    <Card className="grid gap-4 bg-card shadow-panel">
       <div>
         <h2 className="text-[22px] font-black tracking-[-0.03em]">Ringkasan</h2>
         <p className="mt-1 text-sm text-muted-foreground">Total otomatis mengikuti tanggal dan pembayaran.</p>

@@ -21,44 +21,44 @@ const dayNames = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 const bookingColorClasses = [
   {
-    cell: "bg-sky-100 font-black text-sky-700 ring-1 ring-inset ring-sky-200 hover:bg-sky-100",
-    date: "bg-white text-sky-700 shadow-sm",
-    text: "text-sky-950/80",
+    cell: "bg-sky-100 font-black text-sky-700 ring-1 ring-inset ring-sky-200 hover:bg-sky-100 dark:bg-sky-950/60 dark:text-sky-200 dark:ring-sky-800 dark:hover:bg-sky-950/70",
+    date: "bg-card text-sky-700 shadow-sm dark:text-sky-200",
+    text: "text-sky-950/80 dark:text-sky-100/85",
   },
   {
-    cell: "bg-emerald-100 font-black text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100",
-    date: "bg-white text-emerald-700 shadow-sm",
-    text: "text-emerald-950/80",
+    cell: "bg-emerald-100 font-black text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-200 dark:ring-emerald-800 dark:hover:bg-emerald-950/70",
+    date: "bg-card text-emerald-700 shadow-sm dark:text-emerald-200",
+    text: "text-emerald-950/80 dark:text-emerald-100/85",
   },
   {
-    cell: "bg-violet-100 font-black text-violet-700 ring-1 ring-inset ring-violet-200 hover:bg-violet-100",
-    date: "bg-white text-violet-700 shadow-sm",
-    text: "text-violet-950/80",
+    cell: "bg-violet-100 font-black text-violet-700 ring-1 ring-inset ring-violet-200 hover:bg-violet-100 dark:bg-violet-950/60 dark:text-violet-200 dark:ring-violet-800 dark:hover:bg-violet-950/70",
+    date: "bg-card text-violet-700 shadow-sm dark:text-violet-200",
+    text: "text-violet-950/80 dark:text-violet-100/85",
   },
   {
-    cell: "bg-rose-100 font-black text-rose-700 ring-1 ring-inset ring-rose-200 hover:bg-rose-100",
-    date: "bg-white text-rose-700 shadow-sm",
-    text: "text-rose-950/80",
+    cell: "bg-rose-100 font-black text-rose-700 ring-1 ring-inset ring-rose-200 hover:bg-rose-100 dark:bg-rose-950/60 dark:text-rose-200 dark:ring-rose-800 dark:hover:bg-rose-950/70",
+    date: "bg-card text-rose-700 shadow-sm dark:text-rose-200",
+    text: "text-rose-950/80 dark:text-rose-100/85",
   },
   {
-    cell: "bg-amber-100 font-black text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100",
-    date: "bg-white text-amber-700 shadow-sm",
-    text: "text-amber-950/80",
+    cell: "bg-amber-100 font-black text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100 dark:bg-amber-950/60 dark:text-amber-200 dark:ring-amber-800 dark:hover:bg-amber-950/70",
+    date: "bg-card text-amber-700 shadow-sm dark:text-amber-200",
+    text: "text-amber-950/80 dark:text-amber-100/85",
   },
   {
-    cell: "bg-cyan-100 font-black text-cyan-700 ring-1 ring-inset ring-cyan-200 hover:bg-cyan-100",
-    date: "bg-white text-cyan-700 shadow-sm",
-    text: "text-cyan-950/80",
+    cell: "bg-cyan-100 font-black text-cyan-700 ring-1 ring-inset ring-cyan-200 hover:bg-cyan-100 dark:bg-cyan-950/60 dark:text-cyan-200 dark:ring-cyan-800 dark:hover:bg-cyan-950/70",
+    date: "bg-card text-cyan-700 shadow-sm dark:text-cyan-200",
+    text: "text-cyan-950/80 dark:text-cyan-100/85",
   },
   {
-    cell: "bg-fuchsia-100 font-black text-fuchsia-700 ring-1 ring-inset ring-fuchsia-200 hover:bg-fuchsia-100",
-    date: "bg-white text-fuchsia-700 shadow-sm",
-    text: "text-fuchsia-950/80",
+    cell: "bg-fuchsia-100 font-black text-fuchsia-700 ring-1 ring-inset ring-fuchsia-200 hover:bg-fuchsia-100 dark:bg-fuchsia-950/60 dark:text-fuchsia-200 dark:ring-fuchsia-800 dark:hover:bg-fuchsia-950/70",
+    date: "bg-card text-fuchsia-700 shadow-sm dark:text-fuchsia-200",
+    text: "text-fuchsia-950/80 dark:text-fuchsia-100/85",
   },
   {
-    cell: "bg-lime-100 font-black text-lime-700 ring-1 ring-inset ring-lime-200 hover:bg-lime-100",
-    date: "bg-white text-lime-700 shadow-sm",
-    text: "text-lime-950/80",
+    cell: "bg-lime-100 font-black text-lime-700 ring-1 ring-inset ring-lime-200 hover:bg-lime-100 dark:bg-lime-950/60 dark:text-lime-200 dark:ring-lime-800 dark:hover:bg-lime-950/70",
+    date: "bg-card text-lime-700 shadow-sm dark:text-lime-200",
+    text: "text-lime-950/80 dark:text-lime-100/85",
   },
 ] as const;
 
@@ -332,9 +332,9 @@ export function AvailabilityCalendar() {
             const className = cn(
               "group relative min-h-11 border-b border-r border-border p-1.5 text-left text-xs transition last:border-r-0 hover:bg-muted sm:min-h-16 sm:p-2.5 sm:text-sm",
               index % 7 === 6 && "border-r-0",
-              day.muted && "bg-white/60 text-[#c1c1c1]",
+              day.muted && "bg-card/60 text-[#c1c1c1] dark:text-muted-foreground/45",
               bookingColor?.cell,
-              isBlockedOnly && "bg-foreground font-black text-white hover:bg-foreground",
+              isBlockedOnly && "bg-foreground font-black text-background ring-1 ring-inset ring-border hover:bg-foreground",
             );
 
             const content = (
@@ -349,7 +349,7 @@ export function AvailabilityCalendar() {
                 ) : null}
                 {isBlockedOnly ? (
                   <div className="mt-1.5 hidden sm:block">
-                    <small className="relative z-10 line-clamp-2 block text-xs font-semibold leading-4 text-white/80">
+                    <small className="relative z-10 line-clamp-2 block text-xs font-semibold leading-4 text-background/80">
                       {blocked.reason || "Tidak tersedia"}
                     </small>
                   </div>
@@ -365,7 +365,7 @@ export function AvailabilityCalendar() {
                           key={`${event.bookingId}-${event.type}`}
                           title={`${eventLabel} - ${event.guestName}`}
                           className={cn(
-                            "rounded-full border bg-white px-1 py-0.5 text-[8px] font-black leading-none shadow-sm sm:px-1.5 sm:text-[9px]",
+                            "rounded-full border bg-card px-1 py-0.5 text-[8px] font-black leading-none shadow-sm sm:px-1.5 sm:text-[9px]",
                             eventColor.date,
                           )}
                         >
@@ -394,8 +394,8 @@ export function AvailabilityCalendar() {
           <span className="h-2.5 w-6 rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-rose-400" />
           Tanggal terisi
         </span>
-        <span className="inline-flex items-center gap-2 rounded-2xl border border-foreground bg-foreground px-3 py-1.5 text-xs font-bold text-white">
-          <span className="h-2.5 w-2.5 rounded-full bg-white" />
+        <span className="inline-flex items-center gap-2 rounded-2xl border border-foreground bg-foreground px-3 py-1.5 text-xs font-bold text-background">
+          <span className="h-2.5 w-2.5 rounded-full bg-background" />
           Tanggal diblokir
         </span>
         <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-muted px-3 py-1.5 text-xs font-bold text-muted-foreground">
@@ -405,7 +405,7 @@ export function AvailabilityCalendar() {
       </div>
 
       <div className="grid gap-4 border-t border-border p-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(320px,1fr)]">
-        <form className="grid gap-3 rounded-[20px] border border-border bg-white p-4" onSubmit={createDateBlock}>
+        <form className="grid gap-3 rounded-[20px] border border-border bg-card p-4" onSubmit={createDateBlock}>
           <div>
             <h3 className="text-lg font-black tracking-[-0.03em]">Blok tanggal</h3>
             <p className="mt-1 text-sm text-muted-foreground">Tutup tanggal tertentu untuk maintenance, owner stay, atau kebutuhan lain.</p>
@@ -429,7 +429,7 @@ export function AvailabilityCalendar() {
           </Button>
         </form>
 
-        <div className="rounded-[20px] border border-border bg-white p-4">
+        <div className="rounded-[20px] border border-border bg-card p-4">
           <h3 className="text-lg font-black tracking-[-0.03em]">Blok bulan ini</h3>
           <div className="mt-3 grid gap-2">
             {dateBlocks.length ? dateBlocks.map((block) => (

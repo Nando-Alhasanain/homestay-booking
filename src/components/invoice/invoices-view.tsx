@@ -114,7 +114,7 @@ function InvoiceCard({ invoice }: { invoice: InvoiceListItem }) {
   const whatsAppUrl = getWhatsAppInvoiceUrl(invoice.guestPhone);
 
   return (
-    <div className="grid gap-3 rounded-[18px] border border-border bg-white p-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+    <div className="grid gap-3 rounded-[18px] border border-border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto]">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <strong className="truncate">{invoice.invoiceNumber}</strong>

@@ -94,7 +94,7 @@ export function InvoicePreview({
 
   return (
     <div className="relative grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.75fr)]">
-      <article className="min-h-[420px] rounded-[20px] border border-border bg-white p-5 md:p-6">
+      <article className="min-h-[420px] rounded-[20px] border border-border bg-card p-5 md:p-6">
         <div className="mb-5 grid gap-4 border-b border-border pb-5 sm:grid-cols-[1fr_auto]">
           <div>
             <div className="text-3xl font-black tracking-[-0.04em]">Invoice</div>
